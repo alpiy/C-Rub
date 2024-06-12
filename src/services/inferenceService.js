@@ -5,9 +5,10 @@ async function predictClassification(model, image) {
   try {
     const tensor = tf.node
       .decodeJpeg(image)
-      .resizeNearestNeighbor([224, 224, 3])
+      .resizeNearestNeighbor([null, 224, 224, 3])
       .expandDims()
-      .toFloat();
+      .toFloat()
+      .div(tf.scalar(255.0));
 
     const prediction = model.predict(tensor);
     const score = await prediction.data();
@@ -16,11 +17,11 @@ async function predictClassification(model, image) {
 
 // console.log(score[0])
     if (score[0]> 0.5){
-      label = "Cancer";
-      suggestion = "Segera periksa ke dokter!";
+      label = "ORGANIK";
+      suggestion = "Buang Sampah ke sini";
     } else {
-      label = "Non-cancer";
-      suggestion = "Anda sehat!";
+      label = "NON-ORGANIK";
+      suggestion = "Buang sampah ke sini ";
     }
     return {label,suggestion};
   } catch (error){  
